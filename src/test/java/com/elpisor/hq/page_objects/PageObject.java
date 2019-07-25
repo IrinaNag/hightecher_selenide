@@ -1,4 +1,4 @@
-package com.elpisor.hq.manager.page_objects;
+package com.elpisor.hq.page_objects;
 
 import com.codeborne.selenide.ElementsCollection;
 import lombok.NoArgsConstructor;

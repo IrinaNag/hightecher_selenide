@@ -1,8 +1,8 @@
 package com.elpisor.hq.tests.ui_tests;
 
 import com.codeborne.selenide.ElementsCollection;
-import com.elpisor.hq.manager.page_objects.Header;
-import com.elpisor.hq.manager.page_objects.RegistrationPage;
+import com.elpisor.hq.page_objects.Header;
+import com.elpisor.hq.page_objects.RegistrationPage;
 import com.elpisor.hq.model.User;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;

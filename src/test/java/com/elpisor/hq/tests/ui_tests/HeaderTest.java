@@ -1,6 +1,6 @@
 package com.elpisor.hq.tests.ui_tests;
 
-import com.elpisor.hq.manager.page_objects.Header;
+import com.elpisor.hq.page_objects.Header;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 

@@ -1,44 +1,31 @@
-package com.elpisor.hq.manager.page_objects;
+package com.elpisor.hq.page_objects;
 
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
-import com.elpisor.hq.model.User;
+import com.elpisor.hq.model.UserCreds;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-
-import java.util.List;
 
 import static com.codeborne.selenide.Selenide.$;
 import static java.lang.String.format;
 
-public class RegistrationPage extends PageObject {
+public class LoginPage extends PageObject {
 
-    private By username = By.cssSelector("input#username");
-    private By name = By.cssSelector("input#name");
-    private By surname = By.cssSelector("input#surname");
     private By email = By.cssSelector("input#email");
-    private By phone = By.cssSelector("input#phone");
     private By password = By.cssSelector("input#password");
-    private By password_confirmation = By.cssSelector("input#password_confirmation");
     private String error = "//div[contains(text(),'%s')]";
     private By errors = By.xpath("//div[@class='alert alert-danger']");
     private By body = By.xpath("//body//form");
     private By submit = By.xpath("//body//form//button");
     private By fieldNames = By.cssSelector("label");
 
-    public RegistrationPage fillRegistrationForm(User user) {
-        type(username, user.getUsername());
-        type(name, user.getName());
-        type(surname, user.getSurname());
-        type(email, user.getEmail());
-        type(phone, user.getPhone());
-        type(password, user.getPassword());
-        type(password_confirmation, user.getPassword_confirmation());
+    public LoginPage fillLoginForm(UserCreds userCreds) {
+        type(email, userCreds.getEmail());
+        type(password, userCreds.getPassword());
         click(body);
         return this;
     }
 
-    public void clickSubmit() {
+    public void clickSubmit() {//Change void to other page
         click(submit);
     }
 
