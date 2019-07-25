@@ -1,10 +1,15 @@
 package com.elpisor.hq.manager.page_objects;
 
+import com.codeborne.selenide.ElementsCollection;
+import com.codeborne.selenide.SelenideElement;
 import com.elpisor.hq.model.User;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
 import java.util.List;
+
+import static com.codeborne.selenide.Selenide.$;
+import static java.lang.String.format;
 
 public class RegistrationPage extends PageObject {
 
@@ -15,15 +20,11 @@ public class RegistrationPage extends PageObject {
     private By phone = By.cssSelector("input#phone");
     private By password = By.cssSelector("input#password");
     private By password_confirmation = By.cssSelector("input#password_confirmation");
+    private String error = "//div[contains(text(),'%s')]";
     private By errors = By.xpath("//div[@class='alert alert-danger']");
     private By body = By.xpath("//body//form");
     private By submit = By.xpath("//body//form//button");
     private By fieldNames = By.cssSelector("label");
-
-
-    public RegistrationPage(WebDriver driver) {
-        super(driver);
-    }
 
     public RegistrationPage fillRegistrationForm(User user) {
         type(username, user.getUsername());
@@ -41,16 +42,16 @@ public class RegistrationPage extends PageObject {
         click(submit);
     }
 
-    public boolean isSubmitActive() {
-        return isElementActive(submit);
+    public SelenideElement getSubmit() {
+        return $(submit);
     }
 
-    public List<String> getListOfErrors() {
-        return getListOfElements(errors);
+    public SelenideElement getError(String text) {
+        return $(By.xpath(format(error, text)));
     }
 
-    private boolean isThisTheRegistrationPage() {
-        return getCurrentUrl().contains("/registration");
+    public ElementsCollection getErrors() {
+        return getCollectionOfElements(errors);
     }
 
 }

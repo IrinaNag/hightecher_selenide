@@ -14,9 +14,9 @@ import java.util.Arrays;
 
 public class UiTestBase {
 
+
     protected final static String RESOURCES_URL = "src/test/resources/";
     Logger logger = LoggerFactory.getLogger(UiTestBase.class);
-
 
 
     protected static final ApplicationManager app = new ApplicationManager(BrowserType.CHROME);

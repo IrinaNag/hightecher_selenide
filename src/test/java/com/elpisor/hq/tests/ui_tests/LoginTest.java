@@ -1,5 +1,6 @@
 package com.elpisor.hq.tests.ui_tests;
 
+import com.codeborne.selenide.ElementsCollection;
 import com.elpisor.hq.manager.page_objects.Header;
 import com.elpisor.hq.manager.page_objects.LoginPage;
 import com.elpisor.hq.model.UserCreds;
@@ -9,10 +10,11 @@ import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.List;
 
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static com.codeborne.selenide.CollectionCondition.empty;
+import static com.codeborne.selenide.CollectionCondition.size;
+import static com.codeborne.selenide.Condition.enabled;
+import static com.codeborne.selenide.Condition.visible;
 
 public class LoginTest extends UiTestBase {
 
@@ -39,52 +41,52 @@ public class LoginTest extends UiTestBase {
 
     @BeforeMethod
     public void initPageObjects() {
-        app.goTo().openSite(app.getProperties().getProperty("web.baseUrl"));
-        Header header = new Header(app.getDriver());
+        Header header = new Header();
+        header.openHeader();
         loginPage = header.clickLogin();
-    }
-
-    @Test(dataProvider="loginWithoutCreds")
-    public void testLoginWithoutCreds(UserCreds userCreds) {
-        loginPage.fillLoginForm(userCreds);
-        List<String> errors = loginPage.getListOfErrors();
-        int errorsNumber=0;
-        if(userCreds.getEmail()==null){
-            assertTrue(errors.contains("Enter email"));
-            errorsNumber++;
-        }
-        if(userCreds.getPassword()==null){
-            assertTrue(errors.contains("Enter password"));
-            errorsNumber++;
-        }
-        assertTrue(errors.size() == errorsNumber);
-        assertFalse(loginPage.isSubmitActive());
-    }
-
-    @Test(dataProvider = "loginWithWrongEmail")
-    public void testLoginWithWrongEmail(UserCreds userCreds) {
-        loginPage.fillLoginForm(userCreds);
-        List<String> errors = loginPage.getListOfErrors();
-        assertTrue(errors.size() == 1);
-        assertTrue(errors.contains("Wrong email pattern"));
-        assertFalse(loginPage.isSubmitActive());
-    }
-
-    @Test(enabled = false)
-    public void testLoginWithWrongPassword() {
-        loginPage.fillLoginForm(UserCreds.builder().email("a@a").password("1").build());
-        List<String> errors = loginPage.getListOfErrors();
-        assertTrue(errors.size() == 1);
-        assertTrue(errors.contains("Wrong password pattern"));
-        assertFalse(loginPage.isSubmitActive());
     }
 
     @Test(dataProvider = "loginWithPositiveData")
     public void testLoginWithValidCreds(UserCreds userCreds) {
         loginPage.fillLoginForm(userCreds);
-        List<String> errors = loginPage.getListOfErrors();
-        assertTrue(errors.size() == 0);
-//        loginPage.clickSubmit();
-        assertTrue(loginPage.isSubmitActive());
+        ElementsCollection errors = loginPage.getErrors();
+        errors.shouldBe(empty);
+        loginPage.getSubmit().shouldBe(enabled);
     }
+
+    @Test(dataProvider = "loginWithoutCreds")
+    public void testLoginWithoutCreds(UserCreds userCreds) {
+        loginPage.fillLoginForm(userCreds);
+        ElementsCollection errors = loginPage.getErrors();
+        int errorsNumber = 0;
+        if (userCreds.getEmail() == null) {
+            loginPage.getError("Enter email").shouldBe(visible);
+            errorsNumber++;
+        }
+        if (userCreds.getPassword() == null) {
+            loginPage.getError("Enter password").shouldBe(visible);
+            errorsNumber++;
+        }
+        errors.shouldHave(size(errorsNumber));
+        loginPage.getSubmit().shouldNotBe(enabled);
+    }
+
+    @Test(dataProvider = "loginWithWrongEmail")
+    public void testLoginWithWrongEmail(UserCreds userCreds) {
+        loginPage.fillLoginForm(userCreds);
+        ElementsCollection errors = loginPage.getErrors();
+        loginPage.getError("Wrong email pattern").shouldBe(visible);
+        errors.shouldHave(size(1));
+        loginPage.getSubmit().shouldNotBe(enabled);
+    }
+
+    @Test(enabled = false)
+    public void testLoginWithWrongPassword() {
+        loginPage.fillLoginForm(UserCreds.builder().email("a@a").password("1").build());
+        ElementsCollection errors = loginPage.getErrors();
+        loginPage.getError("Wrong password pattern").shouldBe(visible);
+        errors.shouldHave(size(1));
+        loginPage.getSubmit().shouldNotBe(enabled);
+    }
+
 }

@@ -2,44 +2,47 @@ package com.elpisor.hq.manager.page_objects;
 
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
+
+import static com.codeborne.selenide.Selenide.open;
+import static com.codeborne.selenide.Selenide.page;
+import static com.codeborne.selenide.WebDriverRunner.url;
+
 
 public class Header extends PageObject {
 
     RegistrationPage registrationPage;
     LoginPage loginPage;
 
-    private  By registration = By.linkText("Registration");
-    private  By login = By.linkText("Login");
+    private By registration = By.linkText("Registration");
+    private By login = By.linkText("Login");
 
-    public Header(WebDriver driver) {
-        super(driver);
+    public Header openHeader() {
+        open("/");
+        return this;
     }
 
-     public LoginPage clickLogin(){
-        if(!isThisTheLoginPage()){
-            LoginPage newLoginPage=new LoginPage(driver);
-            loginPage=newLoginPage;
+    public LoginPage clickLogin() {
+        if (!isThisTheLoginPage()) {
+            loginPage = page(LoginPage.class);
         }
         click(login);
         return this.loginPage;
     }
 
-    public RegistrationPage clickRegistration(){
-        if(!isThisTheRegistrationPage()){
-            RegistrationPage newRegistrationPage=new RegistrationPage(driver);
-            registrationPage=newRegistrationPage;
+    public RegistrationPage clickRegistration() {
+        if (!isThisTheRegistrationPage()) {
+            registrationPage = page(RegistrationPage.class);
         }
         click(registration);
         return this.registrationPage;
     }
 
     public boolean isThisTheLoginPage() {
-        return getCurrentUrl().contains("/login");
+        return url().contains("/login");
     }
 
     public boolean isThisTheRegistrationPage() {
-        return getCurrentUrl().contains("/registration");
+        return url().contains("/registration");
     }
 
 }

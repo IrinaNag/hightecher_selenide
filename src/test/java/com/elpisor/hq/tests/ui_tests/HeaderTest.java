@@ -12,46 +12,51 @@ public class HeaderTest extends UiTestBase {
 
     @BeforeMethod
     public void initPageObjects() {
-        app.goTo().openSite(app.getProperties().getProperty("web.baseUrl"));
-        header = new Header(app.getDriver());
+        header = new Header();
     }
 
     @Test
     public void testGotoLoginPageFromMainPage() {
-        header.clickLogin();
+        header.openHeader()
+                .clickLogin();
         assertTrue(header.isThisTheLoginPage());
     }
 
     @Test
     public void testGotoLoginPageFromRegistrationPage() {
-        header.clickRegistration();
+        header.openHeader()
+                .clickRegistration();
         header.clickLogin();
         assertTrue(header.isThisTheLoginPage());
     }
 
     @Test
     public void testGotoLoginPageFromLoginPage() {
-        header.clickLogin();
+        header.openHeader()
+                .clickLogin();
         header.clickLogin();
         assertTrue(header.isThisTheLoginPage());
     }
 
     @Test
     public void testGotoRegistrationPageFromMainPage() {
-        header.clickRegistration();
+        header.openHeader()
+                .clickRegistration();
         assertTrue(header.isThisTheRegistrationPage());
     }
 
     @Test
     public void testGotoRegistrationPageFromRegistrationPage() {
-        header.clickRegistration();
+        header.openHeader()
+                .clickRegistration();
         header.clickRegistration();
         assertTrue(header.isThisTheRegistrationPage());
     }
 
     @Test
     public void testGotoRegistrationPageFromLoginPage() {
-        header.clickLogin();
+        header.openHeader()
+                .clickLogin();
         header.clickRegistration();
         assertTrue(header.isThisTheRegistrationPage());
     }

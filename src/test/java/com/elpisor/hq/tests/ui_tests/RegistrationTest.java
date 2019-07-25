@@ -1,5 +1,6 @@
 package com.elpisor.hq.tests.ui_tests;
 
+import com.codeborne.selenide.ElementsCollection;
 import com.elpisor.hq.manager.page_objects.Header;
 import com.elpisor.hq.manager.page_objects.RegistrationPage;
 import com.elpisor.hq.model.User;
@@ -9,10 +10,11 @@ import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.List;
 
-import static org.testng.Assert.assertTrue;
-import static org.testng.AssertJUnit.assertFalse;
+import static com.codeborne.selenide.CollectionCondition.empty;
+import static com.codeborne.selenide.CollectionCondition.size;
+import static com.codeborne.selenide.Condition.enabled;
+import static com.codeborne.selenide.Condition.visible;
 
 public class RegistrationTest extends UiTestBase {
 
@@ -27,6 +29,7 @@ public class RegistrationTest extends UiTestBase {
     private final static String REGISTRATION_WITH_WRONG_PHONE_FILE = "registrationWithWrongPhone.csv";
     private final static String REGISTRATION_WITH_WRONG_PASSWORD_FILE = "registrationWithWrongPassword.csv";
     private final static String REGISTRATION_WITH_WRONG_PASSWORD_CONFIRM_FILE = "registrationWithWrongPasswordConfirm.csv";
+    private Header header;
 
     @DataProvider
     public Iterator<Object[]> registrationWithValidData() throws IOException {
@@ -56,70 +59,73 @@ public class RegistrationTest extends UiTestBase {
 
     @BeforeMethod
     public void initPageObjects() {
-        app.goTo().openSite(app.getProperties().getProperty("web.baseUrl"));
-        Header header = new Header(app.getDriver());
+        Header header = new Header();
+        header.openHeader();
         registrationPage = header.clickRegistration();
     }
+
 
     @Test(dataProvider = "registrationWithValidData")
     public void testRegistrationWithValidData(User user) {
         registrationPage.fillRegistrationForm(user);
-        List<String> errors = registrationPage.getListOfErrors();
-//        registrationPage.clickSubmit();
-        assertTrue(errors.size() == 0);
-        assertTrue(registrationPage.isSubmitActive());
+        ElementsCollection errors = registrationPage.getErrors();
+        errors.shouldBe(empty);
+        registrationPage.getSubmit().shouldBe(enabled);
     }
 
     @Test(dataProvider = "registrationWithoutMandatoryFields")
     public void testRegistrationWithoutMandatoryFields(User user) {
         registrationPage.fillRegistrationForm(user);
-        List<String> errors = registrationPage.getListOfErrors();
+        ElementsCollection errors = registrationPage.getErrors();
         int errorsNumber = 0;
         if (user.getUsername() == null) {
-            assertTrue(errors.contains("Enter username"));
+            registrationPage.getError("Enter username").shouldBe(visible);
             errorsNumber++;
         }
         if (user.getEmail() == null) {
-            assertTrue(errors.contains("Enter email"));
+            registrationPage.getError("Enter email").shouldBe(visible);
             errorsNumber++;
         }
         if (user.getPassword() == null) {
-            assertTrue(errors.contains("Enter password"));
+            registrationPage.getError("Enter password").shouldBe(visible);
             errorsNumber++;
         }
         if (user.getPassword_confirmation() == null) {
-            assertTrue(errors.contains("Enter password confirmation"));
+            registrationPage.getError("Enter password confirmation").shouldBe(visible);
             errorsNumber++;
         }
-        assertTrue(errors.size() == errorsNumber);
-        assertFalse(registrationPage.isSubmitActive());
+        errors.shouldHave(size(errorsNumber));
+        registrationPage.getSubmit().shouldNotBe(enabled);
     }
 
     @Test(dataProvider = "registrationWithWrongEmail")
     public void testRegistrationWithWrongEmail(User user) {
         registrationPage.fillRegistrationForm(user);
-        List<String> errors = registrationPage.getListOfErrors();
-        assertTrue(errors.size() == 1);
-        assertTrue(errors.contains("Wrong email pattern"));
-        assertFalse(registrationPage.isSubmitActive());
+        ElementsCollection errors = registrationPage.getErrors();
+        errors.shouldHave(size(1));
+        registrationPage.getError("Wrong email pattern").shouldBe(visible);
+        registrationPage.getSubmit().shouldNotBe(enabled);
     }
 
     @Test(dataProvider = "registrationWithWrongPassword")
     public void testRegistrationWithWrongPassword(User user) {
         registrationPage.fillRegistrationForm(user);
-        List<String> errors = registrationPage.getListOfErrors();
-        assertTrue(errors.size() == 1);
-        assertTrue(errors.contains("Password must at least 8 character length and must include at least one upper case letter, one down case letter, one digit and one symbol"));
-        assertFalse(registrationPage.isSubmitActive());
+        ElementsCollection errors = registrationPage.getErrors();
+        errors.shouldHave(size(1));
+        registrationPage
+                .getError("Password must at least 8 character length and must include at least one upper case letter," +
+                        " one down case letter, one digit and one symbol")
+                .shouldBe(visible);
+        registrationPage.getSubmit().shouldNotBe(enabled);
     }
 
     @Test(dataProvider = "registrationWithWrongPasswordConfirm")
     public void testRegistrationWithWrongPasswordConfirm(User user) {
         registrationPage.fillRegistrationForm(user);
-        List<String> errors = registrationPage.getListOfErrors();
-        assertTrue(errors.size() == 1);
-        assertTrue(errors.contains("Wrong confirmation"));
-        assertFalse(registrationPage.isSubmitActive());
+        ElementsCollection errors = registrationPage.getErrors();
+        errors.shouldHave(size(1));
+        registrationPage.getError("Wrong confirmation").shouldBe(visible);
+        registrationPage.getSubmit().shouldNotBe(enabled);
     }
 
 }
